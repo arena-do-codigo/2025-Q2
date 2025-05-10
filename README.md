@@ -4,100 +4,29 @@
 
 ## [Participe do Evento ao Vivo em 15/07/2025!](https://youtube.com/live/arena2025)
 
-A Arena do Código é um desafio técnico que tem como principal objetivo compartilhar c- **API (2 instâncias)**: Backend que processa as requisições HTTP.
-   - Deve implementar todos os endpoints especificados.
-   - Deve ser implementado com tecnologias de sua escolha.
-   - **Deve estar acessível em http://localhost:5000**
+A Arena do Código é um desafio técnico que promove conhecimento através de competição! Nesta primeira edição de 2025, desafiamos você a construir um sistema completo de venda de ingressos para eventos.
 
-3. **Banco de Dados**: Persistência para clientes, eventos e compras.
-   - Pode ser SQL ou NoSQL.
-   - *Não é permitido uso exclusivo* de bancos de dados puramente em memória como Redis.
-   - Redis ou tecnologias similares podem ser usadas como cache complementar.
-
-4. **Frontend**: Interface do usuário para interação.
-   - Deve ser servido como um container separado.
-   - **Deve estar acessível em http://localhost:3000** em formato de competição! Esta é a primeira edição de 2025, com um tema desafiador que vai testar suas habilidades em concorrência, escalabilidade e desenvolvimento fullstack.
-
-A data limite para enviar sua submissão é **30 de Junho de 2025 às 23:59:59 (UTC-3)** e os resultados serão anunciados em **15 de Julho de 2025 às 19:00** [numa live](https://youtube.com/live/arena2025) no YouTube.
-
-O tema principal desta Arena é o desenvolvimento de um **Sistema de Venda de Ingressos para Eventos**, com foco em controle de concorrência, performance sob carga e experiência de usuário.
+**Prazo de submissão:** 30 de Junho de 2025 às 23:59:59 (UTC-3)  
+**Divulgação dos resultados:** 15 de Julho de 2025 às 19:00 [em live](https://youtube.com/live/arena2025)
 
 ## Introdução ao Desafio
 
-O Sistema de Venda de Ingressos deve permitir a criação de eventos, cadastro de clientes e compra de ingressos. A principal complexidade está no controle transacional das vendas, garantindo consistência nos dados mesmo sob alta carga concorrente.
+Imagine um cenário de alto estresse: ingressos para shows esgotam em minutos, com milhares de fãs tentando comprar simultaneamente. Como garantir que o sistema não venda mais ingressos do que existem? Como evitar que clientes comprem o mesmo ingresso? Como manter a experiência fluida mesmo sob carga extrema?
 
-Diferente de edições anteriores de desafios técnicos, esta Arena exige tanto o desenvolvimento backend quanto frontend, proporcionando uma experiência end-to-end completa.
+Este é seu desafio: construir um sistema de venda de ingressos **resistente à concorrência** e **escalável**, que:
 
-## O Que Precisa Ser Feito?
+1. Garanta atomicidade nas transações de compra (sem overselling)
+2. Ofereça uma interface administrativa em tempo real
+3. Seja capaz de lidar com picos de carga
+4. Mantenha a consistência dos dados mesmo sob alto tráfego
 
-Para participar você precisa desenvolver:
+Diferente de desafios anteriores, este exige competências tanto em backend (performance, concorrência, escalabilidade) quanto em frontend (experiência em tempo real, responsividade, métricas de desempenho).
 
-1. Uma API HTTP com os endpoints especificados abaixo
-2. Uma interface web que consuma esta API
-3. Um ambiente Docker que rode a solução completa
+## Especificações Técnicas
 
 ### API Backend
 
-#### Endpoints Obrigatórios:
-
-##### 1. Criação de Cliente
-**Requisição**
-
-`POST /clientes`
-```json
-{
-    "nome": "Nome do Cliente",
-    "email": "email@exemplo.com",
-    "cpf": "12345678900"
-}
-```
-
-**Resposta**
-
-`HTTP 201 Created`
-```json
-{
-    "id": "550e8400-e29b-41d4-a716-446655440000",
-    "nome": "Nome do Cliente",
-    "email": "email@exemplo.com",
-    "cpf": "12345678900"
-}
-```
-
-##### 2. Criação de Evento
-**Requisição**
-
-`POST /eventos`
-```json
-{
-    "nome": "Show de Rock",
-    "data": "2025-08-15T20:00:00Z",
-    "capacidade": 100,
-    "preco": 5000
-}
-```
-Onde:
-- `nome` é o nome do evento
-- `data` é a data/hora do evento em formato ISO 8601
-- `capacidade` é a quantidade total de ingressos disponíveis
-- `preco` é o valor em centavos (5000 = R$ 50,00)
-
-**Resposta**
-
-`HTTP 201 Created`
-```json
-{
-    "id": "550e8400-e29b-41d4-a716-446655440001",
-    "nome": "Show de Rock",
-    "data": "2025-08-15T20:00:00Z",
-    "capacidade": 100,
-    "preco": 5000,
-    "ingressos_vendidos": 0,
-    "ingressos_disponiveis": 100
-}
-```
-
-##### 3. Compra de Ingresso
+##### 1. Compra de Ingresso
 **Requisição**
 
 `POST /compras`
@@ -122,7 +51,7 @@ Onde:
 }
 ```
 
-##### 4. Consulta de Evento
+##### 2. Consulta de Evento
 **Requisição**
 
 `GET /eventos/:id`
@@ -147,7 +76,7 @@ Onde `status` pode ser:
 - `disponivel` - ainda há ingressos disponíveis
 - `esgotado` - não há mais ingressos disponíveis
 
-##### 5. Consulta de Cliente e suas Compras
+##### 3. Consulta de Cliente e suas Compras
 **Requisição**
 
 `GET /clientes/:id`
@@ -173,7 +102,7 @@ Onde `status` pode ser:
 }
 ```
 
-##### 6. Listagem de Compras
+##### 4. Listagem de Compras
 **Requisição**
 
 `GET /compras?limite=10&pagina=1`
@@ -205,65 +134,53 @@ Onde `status` pode ser:
 }
 ```
 
-### Regras de Negócio
+## Modelo de Acesso e Regras de Negócio
 
-1. **Limite por Cliente**: Cada cliente só pode comprar **1 ingresso por evento**.
-   - Se tentar comprar novamente, deve retornar erro HTTP 409 Conflict.
+### Usuários e Papéis
 
-2. **Controle de Estoque**: Não pode haver overbooking (mais ingressos vendidos do que disponíveis).
-   - Se não houver ingressos disponíveis, deve retornar erro HTTP 422 Unprocessable Entity.
+O sistema tem dois tipos de usuários:
 
-3. **Transações Atômicas**: A operação de compra deve ser **atômica e segura sob concorrência**.
-   - Isso é especialmente importante quando vários clientes tentam comprar os últimos ingressos simultaneamente.
+| Usuário | Interface | Função |
+|---------|-----------|--------|
+| **Cliente** | Acesso via API (sem interface web) | Cadastrar-se, comprar ingressos, ver histórico |
+| **Admin** | Interface web administrativa | Gerenciar eventos, monitorar compras em tempo real |
 
-4. **Validação de Input**:
-   - Todos os campos são obrigatórios.
-   - CPF deve ser um número válido (apenas dígitos).
-   - Email deve ter formato válido.
-   - Preço e capacidade devem ser valores positivos.
+### Consumidores por Endpoint
 
-5. **Tratamento de Erros**:
-   - Erros de validação: HTTP 400 Bad Request
-   - Recursos não encontrados: HTTP 404 Not Found
-   - Conflitos de regra de negócio: HTTP 409 Conflict ou 422 Unprocessable Entity
+| Endpoint | Método | Consumidor | Descrição |
+|----------|--------|------------|-----------|
+| `/compras` | POST | API (cliente) | Compra de ingressos |
+| `/eventos/:id` | GET | Ambos | Consulta de eventos |
+| `/clientes/:id` | GET | API (cliente) | Histórico de compras |
+| `/compras` | GET | Admin (via frontend) | Monitoramento em tempo real |
 
-### Interface Frontend
+### Regras Críticas
 
-A interface do usuário deve ser uma Single Page Application (SPA) que consuma a API desenvolvida e ofereça, no mínimo, as seguintes páginas:
+1. **Uma compra por cliente**: Cada cliente (identificado pelo GUID fornecido) pode comprar apenas 1 ingresso por evento
+2. **Sem overselling**: O sistema deve garantir que nunca sejam vendidos mais ingressos que o disponível para o evento (identificado pelo GUID fornecido)
+3. **Operações atômicas**: As compras devem ser seguras sob concorrência 
+4. **Atualizações em tempo real**: O painel administrativo deve mostrar compras instantaneamente
 
-#### 1. Página de Eventos
-- Listagem de eventos disponíveis
-- Indicação visual de disponibilidade (disponível/esgotado)
-- Filtragem por data ou status
+### Interface Administrativa
 
-#### 2. Página de Detalhe do Evento
-- Informações completas do evento
-- Contador de ingressos disponíveis/vendidos (atualizado em tempo real)
-- Botão de compra de ingresso
-- Formulário para criar conta ou fazer login antes da compra
+A interface administrativa deve ser uma SPA com:
 
-#### 3. Página de Cliente
-- Dados do cliente
-- Histórico de compras de ingressos
-- Status das compras
+- **Dashboard de eventos**: Lista, status, estatísticas
+- **Detalhes do evento**: Contador em tempo real de ingressos disponíveis/vendidos
+- **Gestão de clientes**: Visualização de histórico de compras
+- **Feed de atividades**: Atualizações em tempo real das compras
 
-#### 4. Página de Feed de Compras
-- Lista de compras recentes em tempo real
-- Informações de cliente e evento
-- Atualizações automáticas quando novas compras são feitas
+### Requisitos Técnicos do Frontend
 
-### Requisitos Técnicos Frontend
+- Framework moderno (React, Vue, Angular)
+- Design responsivo e mobile-first
+- Atualizações em tempo real
+- Métricas de desempenho (FCP, LCP, CLS)
+- Tratamento adequado de erros e estados de carregamento
 
-- Uso de React, Vue, Angular ou framework similar
-- Design responsivo (mobile-first)
-- Atualização em tempo real via WebSockets ou polling
-- Feedback visual durante operações (loading states)
-- Tratamento adequado de erros
-- Interface intuitiva e moderna
+## Requisitos Técnicos
 
-## Arquitetura da Solução
-
-A solução deve ser entregue como um conjunto de containers Docker, seguindo a arquitetura mínima abaixo:
+### Arquitetura
 
 ```mermaid
 flowchart TD
@@ -277,97 +194,47 @@ flowchart TD
     end
 ```
 
-### Componentes Obrigatórios:
+### Componentes e Portas
 
-1. **Load Balancer**: Distribuição de carga entre as instâncias da API (ex: Nginx, HAProxy).
-   - Deve escutar na porta 9999 para receber testes de carga.
-   - Algoritmo de distribuição: round-robin.
+| Componente | Descrição | Porta |
+|------------|-----------|-------|
+| **Load Balancer** | Round-robin entre instâncias | 9999 (testes) |
+| **API (2 instâncias)** | Processa requisições HTTP | 5000 |
+| **Banco de Dados** | Persistência (SQL ou NoSQL) | - |
+| **Frontend** | Interface administrativa | 3000 |
 
-2. **API (2 instâncias)**: Backend que processa as requisições HTTP.
-   - Deve implementar todos os endpoints especificados.
-   - Deve ser implementado com tecnologias de sua escolha.
+### Restrições de Recursos
 
-3. **Banco de Dados**: Persistência para clientes, eventos e compras.
-   - Pode ser SQL ou NoSQL.
-   - *Não é permitido uso exclusivo* de bancos de dados puramente em memória como Redis.
-   - Redis ou tecnologias similares podem ser usadas como cache complementar.
-
-4. **Frontend**: Interface do usuário para interação.
-   - Deve ser servido como um container separado.
-
-## Restrições do Ambiente
-
-A aplicação completa deve funcionar com as seguintes restrições:
-
-- **CPU**: 1.5 unidades de CPU distribuídas entre todos os serviços
-- **Memória**: 550MB distribuídos entre todos os serviços
-
-Todos os serviços precisam ter seus limites explicitamente declarados no `docker-compose.yml`.
-
-Exemplo de configuração de restrições:
+- **CPU Total**: 1.5 unidades
+- **Memória Total**: 550MB
+- Todos os limites devem ser declarados no `docker-compose.yml`
 
 ```yml
 services:
   api01:
-    # ...configurações...
+    # ...
     deploy:
       resources:
         limits:
           cpus: "0.4"
           memory: "120MB"
-  
-  api02:
-    # ...configurações...
-    deploy:
-      resources:
-        limits:
-          cpus: "0.4"
-          memory: "120MB"
-  
-  nginx:
-    # ...configurações...
-    deploy:
-      resources:
-        limits:
-          cpus: "0.1"
-          memory: "10MB"
-  
-  db:
-    # ...configurações...
-    deploy:
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: "240MB"
-
-  frontend:
-    # ...configurações...
-    deploy:
-      resources:
-        limits:
-          cpus: "0.1"
-          memory: "60MB"
+  # ... outros serviços com limites
 ```
 
-**Importante**: A soma dos limites não pode ultrapassar 1.5 CPUs e 550MB de memória!
+### Liberdades Técnicas
 
-### Infraestrutura e Liberdades Técnicas
+Você pode escolher:
+- Linguagens de programação
+- Frameworks
+- Banco de dados (exceto soluções puramente em memória)
+- Arquitetura interna
+- Mecanismos de comunicação em tempo real
 
-Você tem total liberdade para escolher qualquer tecnologia ou arquitetura interna, desde que:
-
-1. Toda a solução esteja contida em um único arquivo `docker-compose.yml`
-2. As restrições de recursos (CPU e memória) sejam respeitadas
-3. As portas especificadas (backend: 5000, frontend: 3000) estejam corretamente expostas
-4. Os requisitos funcionais sejam atendidos
-
-É permitido o uso de:
-- Qualquer linguagem de programação
-- Qualquer framework web
-- Qualquer banco de dados
-- Serviços adicionais (caches, message brokers, etc.)
-- Estratégias de otimização (CDNs, compressão, etc.)
-
-O importante é que a solução funcione conforme especificado dentro das restrições de recursos.
+Desde que:
+- Tudo esteja em um único `docker-compose.yml`
+- Respeite as restrições de recursos
+- Exponha as APIs nas portas especificadas
+- Atenda aos requisitos funcionais
 
 ## Processo de Submissão
 
@@ -392,117 +259,91 @@ Exemplo de estrutura:
 
 1. **Imagens Docker públicas**: Todas as imagens declaradas no `docker-compose.yml` devem estar disponíveis publicamente (ex: Docker Hub).
 2. **Repositório público**: O código fonte completo deve estar em um repositório público do GitHub e linkado no README.md.
-3. **Script de inicialização**: Deve ser fornecido um script para inicializar o banco de dados com dados para teste.
+3. **Script de inicialização**: Deve ser fornecido um script para inicializar o banco de dados que carregue os eventos do arquivo CSV fornecido.
 4. **Documentação**: README.md com instruções claras de como a aplicação funciona e como foi implementada.
 
-## Testes da Solução
+## Avaliação e Testes
 
-### Testes de Carga no Backend
+### Critérios de Avaliação
 
-A aplicação será testada utilizando o [k6](https://k6.io/) com cenários que simularão:
+| Critério | Peso | Aspectos Avaliados |
+|----------|------|-------------------|
+| **Conformidade Funcional** | 30% | Funcionalidades corretas, regras de negócio |
+| **Performance e Escalabilidade** | 30% | Throughput, latência p95/p99, comportamento sob carga |
+| **Consistência de Dados** | 20% | Operações concorrentes, ausência de race conditions |
+| **Frontend e UX** | 15% | Design, tempo real, métricas de desempenho |
+| **Código e Arquitetura** | 5% | Organização, escolhas técnicas, documentação |
 
-1. Alta carga de consultas simultâneas aos eventos
-2. Múltiplas tentativas de compras simultâneas do mesmo ingresso
-3. Verificação de consistência de dados após testes de concorrência
+### Testes Automatizados
 
-O script de teste está disponível em [load-test](./load-test) para que você possa testar sua aplicação durante o desenvolvimento.
-
-#### Como executar os testes de carga
-
+#### Backend (k6)
 ```bash
-# Instale o k6 conforme documentação: https://k6.io/docs/getting-started/installation/
-# Execute os testes
+# Simula alta concorrência na compra de ingressos
 k6 run ./load-test/scenarios.js
 ```
 
-### Testes de Performance do Frontend
-
-O frontend será testado automaticamente utilizando o Lighthouse CI para avaliar:
-
-1. First Contentful Paint (FCP)
-2. Largest Contentful Paint (LCP)
-3. Cumulative Layout Shift (CLS)
-4. First Input Delay (FID) / Total Blocking Time (TBT)
-5. Time to Interactive (TTI)
-
-#### Como executar os testes de performance
-
+#### Frontend (Lighthouse)
 ```bash
-# Instale o Lighthouse CI
-npm install -g @lhci/cli
-
-# Execute os testes
+# Avalia métricas de performance web
 lhci autorun --collect.url=http://localhost:3000
 ```
 
-Os resultados dos testes serão considerados na avaliação final, com pontuações mínimas esperadas:
+**Pontuação mínima esperada:**
 - Performance: 80+
 - Accessibility: 90+
 - Best Practices: 85+
-- SEO: 90+
 
-## Critérios de Avaliação
+### Dados para Teste
 
-A avaliação será feita com base nos seguintes critérios:
+Um arquivo `eventos.csv` com dados iniciais dos eventos está disponível no repositório. Este arquivo contém:
+- 3 eventos com diferentes capacidades e preços
+- Um deles (Concerto de Jazz) já está com 90% de ocupação para testar cenários de concorrência
 
-1. **Conformidade Funcional** (30%)
-   - Implementação correta de todas as funcionalidades especificadas
-   - Aderência às regras de negócio
+Durante os testes, serão fornecidos:
+- GUIDs aleatórios para clientes
+- Os eventos e seus dados são fornecidos no arquivo CSV
 
-2. **Performance e Escalabilidade** (30%)
-   - Throughput (requisições/segundo)
-   - Latência p95/p99
-   - Comportamento sob carga
+## Submissão e Regras
 
-3. **Consistência de Dados** (20%)
-   - Corretitude das operações concorrentes
-   - Ausência de race conditions
-   - Integridade das informações
+### Como Participar
 
-4. **Frontend e UX** (15%)
-   - Design e responsividade
-   - Funcionalidade em tempo real
-   - Tratamento de erros e estados
-   - First Contentful Paint (FCP) e métricas de desempenho
-   - Pontuação no PageSpeed Insights (ou métricas similares)
+1. Faça fork do repositório
+2. Implemente sua solução
+3. Submeta um PR com sua estrutura em `/participantes/seu-nome/`
+4. Inclua os arquivos obrigatórios (docker-compose.yml, README.md, scripts)
 
-5. **Código e Arquitetura** (5%)
-   - Clareza e organização
-   - Escolhas técnicas
-   - Documentação
+### Formato da Submissão
+```
+├─ participantes/
+|  ├─ equipe-campeoes/
+|  |  ├─ docker-compose.yml
+|  |  ├─ nginx.conf
+|  |  ├─ scripts/
+|  |  ├─ README.md
+```
 
-## Dados Iniciais
-
-Para fins de teste, o banco de dados deve ser inicializado com pelo menos:
-
-- 5 clientes com IDs pré-definidos
-- 5 eventos com diferentes capacidades e preços
-- Pelo menos um evento deve estar com 90% dos ingressos vendidos para teste de concorrência na compra dos últimos ingressos
-
-## Regras da Competição
-
-- **Prazo**: 48 horas a partir do anúncio oficial
-- **Equipes**: Individual ou em grupos de até 3 pessoas
-- **Submissões**: Uma submissão por pessoa/equipe
-- **Avaliação**: Os resultados serão divulgados em live no YouTube
-- **Código Aberto**: Todo o código deve ser disponibilizado publicamente
+### Regras
+- **Prazo**: 48 horas
+- **Equipes**: Individual ou até 3 pessoas
+- **Código**: Totalmente aberto no GitHub
+- **Imagens Docker**: Disponíveis publicamente
 
 ## FAQ
 
-**Q: Posso usar qualquer linguagem ou framework?**
-A: Sim, você tem total liberdade para escolher as tecnologias mais adequadas, desde que atenda aos requisitos e restrições de recursos.
+**Q: Posso usar qualquer tecnologia?**  
+A: Sim, desde que respeite os requisitos e limites de recursos.
 
-**Q: É necessário implementar autenticação?**
+**Q: Preciso implementar autenticação?**  
 A: Não é necessário.
 
-**Q: Como será testado se minha aplicação atende aos requisitos de atualização em tempo real?**
-A: Serão realizadas compras simultâneas e verificado se a interface se atualiza em tempo hábil sem necessidade de refresh manual.
+**Q: Preciso criar endpoints para cadastro de eventos e clientes?**  
+A: Não é necessário criar endpoints para cadastro. Os eventos devem ser carregados do arquivo CSV fornecido e para clientes usaremos GUIDs aleatórios durante os testes.
 
-**Q: O que acontece se minha aplicação exceder os limites de CPU/memória?**
-A: Será desclassificada se não conseguir operar dentro dos limites estabelecidos.
+**Q: Como são testadas as atualizações em tempo real?**  
+A: Com compras simultâneas verificando se a interface se atualiza sem refresh manual.
 
 ---
 
-Boa sorte e divirta-se construindo sua solução! Estamos ansiosos para ver as diversas implementações e aprender com a comunidade.
+Boa sorte! Estamos ansiosos para ver sua solução inovadora.
 
-Para dúvidas ou esclarecimentos: [arenadocodigo2025@exemplo.com](mailto:arenadocodigo2025@exemplo.com)
+[arenadocodigo2025@exemplo.com](mailto:arenadocodigo2025@exemplo.com)
