@@ -4,7 +4,19 @@
 
 ## [Participe do Evento ao Vivo em 15/07/2025!](https://youtube.com/live/arena2025)
 
-A Arena do Código é um desafio técnico que tem como principal objetivo compartilhar conhecimento em formato de competição! Esta é a primeira edição de 2025, com um tema desafiador que vai testar suas habilidades em concorrência, escalabilidade e desenvolvimento fullstack.
+A Arena do Código é um desafio técnico que tem como principal objetivo compartilhar c- **API (2 instâncias)**: Backend que processa as requisições HTTP.
+   - Deve implementar todos os endpoints especificados.
+   - Deve ser implementado com tecnologias de sua escolha.
+   - **Deve estar acessível em http://localhost:5000**
+
+3. **Banco de Dados**: Persistência para clientes, eventos e compras.
+   - Pode ser SQL ou NoSQL.
+   - *Não é permitido uso exclusivo* de bancos de dados puramente em memória como Redis.
+   - Redis ou tecnologias similares podem ser usadas como cache complementar.
+
+4. **Frontend**: Interface do usuário para interação.
+   - Deve ser servido como um container separado.
+   - **Deve estar acessível em http://localhost:3000** em formato de competição! Esta é a primeira edição de 2025, com um tema desafiador que vai testar suas habilidades em concorrência, escalabilidade e desenvolvimento fullstack.
 
 A data limite para enviar sua submissão é **30 de Junho de 2025 às 23:59:59 (UTC-3)** e os resultados serão anunciados em **15 de Julho de 2025 às 19:00** [numa live](https://youtube.com/live/arena2025) no YouTube.
 
@@ -339,6 +351,24 @@ services:
 
 **Importante**: A soma dos limites não pode ultrapassar 1.5 CPUs e 550MB de memória!
 
+### Infraestrutura e Liberdades Técnicas
+
+Você tem total liberdade para escolher qualquer tecnologia ou arquitetura interna, desde que:
+
+1. Toda a solução esteja contida em um único arquivo `docker-compose.yml`
+2. As restrições de recursos (CPU e memória) sejam respeitadas
+3. As portas especificadas (backend: 5000, frontend: 3000) estejam corretamente expostas
+4. Os requisitos funcionais sejam atendidos
+
+É permitido o uso de:
+- Qualquer linguagem de programação
+- Qualquer framework web
+- Qualquer banco de dados
+- Serviços adicionais (caches, message brokers, etc.)
+- Estratégias de otimização (CDNs, compressão, etc.)
+
+O importante é que a solução funcione conforme especificado dentro das restrições de recursos.
+
 ## Processo de Submissão
 
 Para participar, você deve fazer um pull request neste repositório incluindo um subdiretório em `participantes` com os seguintes arquivos:
@@ -361,11 +391,13 @@ Exemplo de estrutura:
 ### Requisitos Obrigatórios para Submissão
 
 1. **Imagens Docker públicas**: Todas as imagens declaradas no `docker-compose.yml` devem estar disponíveis publicamente (ex: Docker Hub).
-2. **Repositório público**: O código fonte completo deve estar em um repositório público (GitHub, GitLab, etc.) e linkado no README.md.
+2. **Repositório público**: O código fonte completo deve estar em um repositório público do GitHub e linkado no README.md.
 3. **Script de inicialização**: Deve ser fornecido um script para inicializar o banco de dados com dados para teste.
 4. **Documentação**: README.md com instruções claras de como a aplicação funciona e como foi implementada.
 
-## Testes de Carga
+## Testes da Solução
+
+### Testes de Carga no Backend
 
 A aplicação será testada utilizando o [k6](https://k6.io/) com cenários que simularão:
 
@@ -375,13 +407,39 @@ A aplicação será testada utilizando o [k6](https://k6.io/) com cenários que 
 
 O script de teste está disponível em [load-test](./load-test) para que você possa testar sua aplicação durante o desenvolvimento.
 
-### Como executar os testes
+#### Como executar os testes de carga
 
 ```bash
 # Instale o k6 conforme documentação: https://k6.io/docs/getting-started/installation/
 # Execute os testes
 k6 run ./load-test/scenarios.js
 ```
+
+### Testes de Performance do Frontend
+
+O frontend será testado automaticamente utilizando o Lighthouse CI para avaliar:
+
+1. First Contentful Paint (FCP)
+2. Largest Contentful Paint (LCP)
+3. Cumulative Layout Shift (CLS)
+4. First Input Delay (FID) / Total Blocking Time (TBT)
+5. Time to Interactive (TTI)
+
+#### Como executar os testes de performance
+
+```bash
+# Instale o Lighthouse CI
+npm install -g @lhci/cli
+
+# Execute os testes
+lhci autorun --collect.url=http://localhost:3000
+```
+
+Os resultados dos testes serão considerados na avaliação final, com pontuações mínimas esperadas:
+- Performance: 80+
+- Accessibility: 90+
+- Best Practices: 85+
+- SEO: 90+
 
 ## Critérios de Avaliação
 
@@ -405,6 +463,8 @@ A avaliação será feita com base nos seguintes critérios:
    - Design e responsividade
    - Funcionalidade em tempo real
    - Tratamento de erros e estados
+   - First Contentful Paint (FCP) e métricas de desempenho
+   - Pontuação no PageSpeed Insights (ou métricas similares)
 
 5. **Código e Arquitetura** (5%)
    - Clareza e organização
@@ -433,7 +493,7 @@ Para fins de teste, o banco de dados deve ser inicializado com pelo menos:
 A: Sim, você tem total liberdade para escolher as tecnologias mais adequadas, desde que atenda aos requisitos e restrições de recursos.
 
 **Q: É necessário implementar autenticação?**
-A: Não é obrigatório, mas é um diferencial para segurança.
+A: Não é necessário.
 
 **Q: Como será testado se minha aplicação atende aos requisitos de atualização em tempo real?**
 A: Serão realizadas compras simultâneas e verificado se a interface se atualiza em tempo hábil sem necessidade de refresh manual.
